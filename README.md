@@ -5,17 +5,20 @@ Using the camera parameters of the indvidual pinhole camera model, we project th
 
 ## Usage 
 
-```
-rosrun jrdb_utils register_rgbd
-```
-To uncompress images in the ROSbags
+First uncompress images in the ROSbags
 ```
 rosrun image_transport republish compressed in:=/ros_indigosdk_node/stitched_image0 raw out:=/ros_indigosdk_node/stitched_image0/image_raw
 
 ```
+Run the registration node
+```
+rosrun jrdb_utils register_rgbd
+```
+
 To view projected image 
 
 ```
 rosrun image_view image_view image:=/depth_moed_pub 
 
 ```
+Then play the ROS bag
