@@ -1,3 +1,21 @@
 ## Description
-ROS package used to project 3D lidar point clouds onto a panaromic RGB image in the Stanford JRDB dataset. We first estimate the camera parameters for the panaromic image which is obtained by stitching RGB images from 5 stereo camera setup to cover 360&deg field of view. 
-Based on the camera parameters of the pinhole camera model, we project the Velodyne PointCloud onto the image plane as described [here](http://download.cs.stanford.edu/downloads/jrdb/Sensor_setup_JRDB.pdf)
+ROS package used to project 3D lidar point clouds onto a panaromic RGB image in the Stanford JRDB dataset.
+Using the camera parameters of the indvidual pinhole camera model, we project the Velodyne PointCloud onto the image plane as described [here](http://download.cs.stanford.edu/downloads/jrdb/Sensor_setup_JRDB.pdf)
+
+
+## Usage 
+
+```
+rosrun jrdb_utils register_rgbd
+```
+To uncompress images in the ROSbags
+```
+rosrun image_transport republish compressed in:=/ros_indigosdk_node/stitched_image0 raw out:=/ros_indigosdk_node/stitched_image0/image_raw
+
+```
+To view projected image 
+
+```
+rosrun image_view image_view image:=/depth_moed_pub 
+
+```
