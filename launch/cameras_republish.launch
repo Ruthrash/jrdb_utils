@@ -1,0 +1,14 @@
+<launch>
+
+<node pkg="image_transport" type="republish" name="camera0" output="screen" args=" compressed in:=/ros_indigosdk_node/image0 raw out:=/ros_indigosdk_node/image0/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera1" output="screen" args=" compressed in:=/ros_indigosdk_node/image1 raw out:=/ros_indigosdk_node/image1/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera2" output="screen" args=" compressed in:=/ros_indigosdk_node/image2 raw out:=/ros_indigosdk_node/image2/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera3" output="screen" args=" compressed in:=/ros_indigosdk_node/image3 raw out:=/ros_indigosdk_node/image3/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera4" output="screen" args=" compressed in:=/ros_indigosdk_node/image4 raw out:=/ros_indigosdk_node/image4/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera5" output="screen" args=" compressed in:=/ros_indigosdk_node/image5 raw out:=/ros_indigosdk_node/image5/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera6" output="screen" args=" compressed in:=/ros_indigosdk_node/image6 raw out:=/ros_indigosdk_node/image6/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera7" output="screen" args=" compressed in:=/ros_indigosdk_node/image7 raw out:=/ros_indigosdk_node/image7/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera8" output="screen" args=" compressed in:=/ros_indigosdk_node/image8 raw out:=/ros_indigosdk_node/image8/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera9" output="screen" args=" compressed in:=/ros_indigosdk_node/image9 raw out:=/ros_indigosdk_node/image9/image_raw"/>
+
+</launch>

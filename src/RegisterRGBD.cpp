@@ -68,7 +68,7 @@ void RegisterRGBD::SyncVeloRGB(const sensor_msgs::PointCloud2::ConstPtr& upper_v
         {
             //Vec3b color; color[0] = color[1] = color[2] = 255;//abs(u_point_occam[2]) ;
             //image.at<Vec3b>(upper_vel_pixels[1],upper_vel_pixels[0]) = color;
-            //image.at<float>(upper_vel_pixels[1],upper_vel_pixels[0]) = u_point_occam[2];
+            image.at<float>(upper_vel_pixels[1],upper_vel_pixels[0]) = u_point_occam[2];
         }
             
         

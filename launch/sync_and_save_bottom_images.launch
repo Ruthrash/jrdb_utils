@@ -1,0 +1,8 @@
+<launch>
+<arg name="file_name" />
+<arg name="number" />
+  <rosparam>use_sim_time: true</rosparam>
+<node pkg="jrdb_utils" type="timestamp.py" name="saver" output="screen" args="$(arg number)"/>
+<node pkg="rosbag" type="play" name="player" output="log" args="--clock  --rate=0.25 $(arg file_name)"/>
+
+</launch>
