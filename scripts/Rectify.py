@@ -29,16 +29,18 @@ def drawlines(img1, img2, lines, pts1, pts2):
 
 
 
-imgLorig = cv2.imread("/media/ruthz/data/cvgl/group/jrdb/data/train_dataset/images/image_0/bytes-cafe-2019-02-07_0/000000.jpg",cv2.IMREAD_GRAYSCALE)  # left image
-imgRorig = cv2.imread("/media/ruthz/data/cvgl/group/jrdb/data/train_dataset/images/image_1/bytes-cafe-2019-02-07_0/000000.jpg",cv2.IMREAD_GRAYSCALE)  # right image
+#imgLorig = cv2.imread("/media/ruthz/data/cvgl/group/jrdb/data/train_dataset/images/image_stitched/bytes-cafe-2019-02-07_0/000000.jpg",cv2.IMREAD_GRAYSCALE)  # left image
+#imgRorig = cv2.imread("/media/ruthz/data/cvgl/group/jrdb/data/train_dataset/images/image_bottom_stitched/bytes-cafe-2019-02-07_0/000000.jpg",cv2.IMREAD_GRAYSCALE)  # right image
 
 #imgL = cv2.imread("/media/ruthz/data/cvgl/group/jrdb/data/train_dataset/images/image_0/bytes-cafe-2019-02-07_0/000000.jpg",cv2.IMREAD_GRAYSCALE)  # left image
 #imgR = cv2.imread("/media/ruthz/data/cvgl/group/jrdb/data/train_dataset/images/image_1/bytes-cafe-2019-02-07_0/000000.jpg",cv2.IMREAD_GRAYSCALE)  # right image
 
 #finalimg = finalimg*0
 
-imgL = cv2.imread("/media/ruthz/data/cvgl/group/jrdb/data/train_dataset/stereo/left/75.jpg",cv2.IMREAD_GRAYSCALE)  # left image
-imgR = cv2.imread("/media/ruthz/data/cvgl/group/jrdb/data/train_dataset/stereo/right/75.jpg",cv2.IMREAD_GRAYSCALE)  # right image
+#imgL = cv2.imread("/media/ruthz/data/cvgl/group/jrdb/data/train_dataset/stereo/left/75.jpg",cv2.IMREAD_GRAYSCALE)  # left image
+#imgR = cv2.imread("/media/ruthz/data/cvgl/group/jrdb/data/train_dataset/stereo/right/75.jpg",cv2.IMREAD_GRAYSCALE)  # right image
+imgL = cv2.imread("/media/ruthz/data/cvgl/group/jrdb/data/train_dataset/images/image_top_stitched/bytes-cafe-2019-02-07_0/000000.jpg",cv2.IMREAD_GRAYSCALE)  # left image
+imgR = cv2.imread("/media/ruthz/data/cvgl/group/jrdb/data/train_dataset/images/image_bottom_stitched/bytes-cafe-2019-02-07_0/000000.jpg",cv2.IMREAD_GRAYSCALE)  # right image
 
 #imgL = cv2.flip(imgL,0)
 #imgR = cv2.flip(imgR,0)
@@ -52,7 +54,7 @@ h, w = imgL.shape[:2]
 
 
 ###############Undistort images and show them#########################
-
+"""
 K_left = np.array([[476.71, 0., 350.738],
               [0., 479.505, 209.532],
               [0., 0., 1.]])
@@ -92,7 +94,7 @@ oldimg_ax.set_title('Original rigt image')
 newimg_ax.imshow(newimgR)
 newimg_ax.set_title('Undistorted right image')
 plt.show()
-
+"""
 
 #imgR = newimgR 
 #imgL = newimgL
@@ -182,8 +184,8 @@ imgL_rectified = cv2.warpPerspective(imgL, H1, (w1, h1))
 imgR_rectified = cv2.warpPerspective(imgR, H2, (w2, h2))
 
 
-imgL_rectified = imgL
-imgR_rectified = imgR
+#imgL_rectified = imgL
+#imgR_rectified = imgR
 #img1_rectified = cv2.rotate(img1_rectified, cv2.cv2.ROTATE_90_CLOCKWISE)
 #img2_rectified = cv2.rotate(img2_rectified, cv2.cv2.ROTATE_90_CLOCKWISE)
 
@@ -263,7 +265,7 @@ plt.imshow(disparity_SGBM, "gray")
 plt.colorbar()
 plt.show()
 
-disparity_SGBM = stereo.compute(imgL_rectified, imgR_rectified)
+disparity_SGBM = stereo.compute(imgL_rectified, imgR_rectified).astype(np.float32) / 16.0
 
 plt.imshow(disparity_SGBM, "gray")
 plt.colorbar()
@@ -303,6 +305,13 @@ newcameramatrix, roi = cv2.getOptimalNewCameraMatrix(K_left, d_left*-1, (w,h), 0
 undistorted_frame = cv2.undistort(disparity_SGBM, K_left, d_left*-1, None, newcameramatrix)
 
 #imgL = cv2.rotate(imgL, cv2.cv2.ROTATE_90_CLOCKWISE)
+disparity_SGBM = (disparity_SGBM - min_disp)/num_disp
+inv_disp = disparity_SGBM 
+inv_disp = 1- inv_disp
+ret, inv_disp = cv2.threshold(invdisp,.98,255,cv2.THRESH_TOZERO_INV)
+plt.imshow(inv_disp)
+plt.show()
+
 plt.subplot(121), plt.imshow(cv2.flip(undistorted_frame,1)) 
 plt.subplot(122), plt.imshow(imgLorig) 
 plt.show()

@@ -31,7 +31,7 @@ class Calibration(object):
         TODO(rqi): do matrix multiplication only once for each projection.
     '''
     def __init__(self, calib_filepath):
-
+        print('init')
         calibs = self.read_calib_file(calib_filepath)
         # Projection matrix from rect camera coord to image2 coord
         self.P = calibs['P2'] 
@@ -59,7 +59,7 @@ class Calibration(object):
         RA[3,3] = 1
         self.D = np.matmul(self.P,RA).T
         self.D_torch = torch.from_numpy(self.D).float().cuda()
-
+        #print(self.D_torch)
         # Camera intrinsics and extrinsics
         self.c_u = self.P[0,2]
         self.c_v = self.P[1,2]
@@ -182,7 +182,8 @@ class Calibration(object):
         pts_2d = torch.matmul(pts_3d_ref, self.D_torch) # nx3
         pts_2d[:,0] /= pts_2d[:,2]
         pts_2d[:,1] /= pts_2d[:,2]
-        return pts_2d[:,0:2]
+        print("asdafsdf",np.shape(pts_2d), np.shape(pts_2d[:,0:2]))
+        return pts_2d[:,0:3]
 
     def project_velo_to_image(self, pts_3d_velo):
         ''' Input: nx3 points in velodyne coord.
@@ -405,18 +406,18 @@ class OmniCalibration(Calibration):
         horizontal_fraction = theta/ (2*np.pi)
         x = (horizontal_fraction * self.img_shape[2]) % self.img_shape[2]
         y = -self.median_focal_length_y*(pointcloud[:, 1]*torch.cos(theta)/pointcloud[:, 2]) + self.median_optical_center_y
-        pts_2d = torch.stack([x, y], dim=1)
+        depth = np.sqrt(np.square(pointcloud[:,2]) + np.square(pointcloud[:,0]))
+        pts_2d = torch.stack([x, y,depth], dim=1)
         
         return pts_2d
 
 
     def project_image_to_rect(self, uvdepth):
 
-        theta = (uvdepth[:, 0]/self.img_shape[2])*2*np.pi - np.pi
+        theta = (uvdepth[:, 0]/self.img_shape[2])*2*np.pi  - np.pi
         z = uvdepth[:, 2]*np.cos(theta)
         x = uvdepth[:, 2]*np.sin(theta)
         y = z*-1*(uvdepth[:, 1] - self.median_optical_center_y)/(self.median_focal_length_y * np.cos(theta))
-
         return np.stack([x,y,z], axis=1)
 
     def project_velo_to_ref(self, pointcloud):
@@ -446,7 +447,26 @@ class OmniCalibration(Calibration):
         pointcloud[:, :3] = self.project_velo_to_ref(pointcloud[:, :3])
         return pointcloud
         
-    
+
+    def move_lidar_to_lower_camera_frame(self, pointcloud, upper = True):
+        # assumed only rotation about z axis
+        
+        if upper:
+            pointcloud[:,:3] =  \
+                pointcloud[:,:3] - torch.Tensor(self.global_config_dict['calibrated']
+                                                ['lidar_upper_to_lowerrgb']['translation']).type(pointcloud.type())
+            theta = self.global_config_dict['calibrated']['lidar_upper_to_lowerrgb']['rotation'][-1]
+        else:
+            pointcloud[:,:3] =  \
+                pointcloud[:,:3] - torch.Tensor(self.global_config_dict['calibrated']
+                                                ['lidar_lower_to_lowerrgb']['translation']).type(pointcloud.type())
+            theta = self.global_config_dict['calibrated']['lidar_lower_to_lowerrgb']['rotation'][-1]
+
+        rotation_matrix = torch.Tensor([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]]).type(pointcloud.type())
+        pointcloud[:, :2] = torch.matmul(rotation_matrix, pointcloud[:, :2].unsqueeze(2)).squeeze()
+        pointcloud[:, :3] = self.project_velo_to_ref(pointcloud[:, :3])
+        return pointcloud
+        
     def calculate_median_param_value(self, param):
         if param=='f_y':
             idx = 4

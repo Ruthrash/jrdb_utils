@@ -9,6 +9,62 @@
 <node pkg="image_transport" type="republish" name="camera6" output="screen" args=" compressed in:=/ros_indigosdk_node/image6 raw out:=/ros_indigosdk_node/image6/image_raw"/>
 <node pkg="image_transport" type="republish" name="camera7" output="screen" args=" compressed in:=/ros_indigosdk_node/image7 raw out:=/ros_indigosdk_node/image7/image_raw"/>
 <node pkg="image_transport" type="republish" name="camera8" output="screen" args=" compressed in:=/ros_indigosdk_node/image8 raw out:=/ros_indigosdk_node/image8/image_raw"/>
-<node pkg="image_transport" type="republish" name="camera9" output="screen" args=" compressed in:=/ros_indigosdk_node/image9 raw out:=/ros_indigosdk_node/image9/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera9" output="screen" args=" compressed in:=/ros_indigosdk_node/image9 raw out:=/ros_indigosdk_node/image9/image_raw"/> 
+
+
+<node pkg="ros_indigosdk" type="rectify" name="rectify1" output="log" args="top_image:=/ros_indigosdk_node/image0/image_raw 
+									    top_image_info:=/ros_indigosdk_node/camera_info0 
+									    bottom_image:=/ros_indigosdk_node/image1/image_raw 
+									    bottom_image_info:=/ros_indigosdk_node/camera_info5
+									    image_top_rect:=/image_top_0
+									    image_bottom_rect:=/image_bottom_1 "/>
+
+<node pkg="ros_indigosdk" type="rectify" name="rectify2" output="log" args="top_image:=/ros_indigosdk_node/image2/image_raw 
+									    top_image_info:=/ros_indigosdk_node/camera_info1 
+									    bottom_image:=/ros_indigosdk_node/image3/image_raw 
+									    bottom_image_info:=/ros_indigosdk_node/camera_info6
+									    image_top_rect:=/image_top_2
+									    image_bottom_rect:=/image_bottom_3 "/>
+
+<node pkg="ros_indigosdk" type="rectify" name="rectify3" output="log" args="top_image:=/ros_indigosdk_node/image4/image_raw 
+									    top_image_info:=/ros_indigosdk_node/camera_info2 
+									    bottom_image:=/ros_indigosdk_node/image5/image_raw 
+									    bottom_image_info:=/ros_indigosdk_node/camera_info7
+									    image_top_rect:=/image_top_4
+									    image_bottom_rect:=/image_bottom_5 "/>
+
+<node pkg="ros_indigosdk" type="rectify" name="rectify4" output="log" args="top_image:=/ros_indigosdk_node/image6/image_raw 
+									    top_image_info:=/ros_indigosdk_node/camera_info3 
+									    bottom_image:=/ros_indigosdk_node/image7/image_raw 
+									    bottom_image_info:=/ros_indigosdk_node/camera_info8
+									    image_top_rect:=/image_top_6
+									    image_bottom_rect:=/image_bottom_7 "/>
+
+<node pkg="ros_indigosdk" type="rectify" name="rectify5" output="log" args="top_image:=/ros_indigosdk_node/image8/image_raw 
+									    top_image_info:=/ros_indigosdk_node/camera_info4 
+									    bottom_image:=/ros_indigosdk_node/image9/image_raw 
+									    bottom_image_info:=/ros_indigosdk_node/camera_info9
+									    image_top_rect:=/image_top_8
+									    image_bottom_rect:=/image_bottom_9 "/>
+
+<!--<node pkg="ros_indigosdk" type="stitch" name="stitch" output="log" args="image0:=/disparity_image_0
+									image1:=/disparity_image_2
+									image2:=/disparity_image_4
+									image3:=/disparity_image_6
+									image4:=/disparity_image_8
+									camera_info0:=/ros_indigosdk_node/camera_info0
+									camera_info1:=/ros_indigosdk_node/camera_info1
+									camera_info2:=/ros_indigosdk_node/camera_info2
+									camera_info3:=/ros_indigosdk_node/camera_info3
+									camera_info4:=/ros_indigosdk_node/camera_info4
+									"/>-->
+
+
+
+<!--<node pkg="ros_indigosdk" type="cloud" name="cloudify" output="screen" args="image:=/ros_indigosdk_node/image0/image_raw 
+									    disp:=/disparity_image_0 
+									    camera_info:=/ros_indigosdk_node/camera_info0 
+									    camera_info_other:=/ros_indigosdk_node/camera_info5"/> -->
+
 
 </launch>

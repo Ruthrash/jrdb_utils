@@ -6,13 +6,37 @@ calibrated:
     # in meters: [x,y,z]
     translation: [0, 0, -0.33529]
     # in radians: [x,y,z]
-    rotation: [0, 0, 0.085]
+    #rotation: [0, 0, 0.085]
+    rotation: [0, 0, -1.4857]
  
   lidar_lower_to_rgb:
 
     translation: [0, 0, 0.13511]
     
-    rotation: [0, 0, 0]
+    #rotation: [0, 0, 0]
+    rotation: [0, 0,-1.5707]
+
+
+
+
+
+
+
+
+
+  lidar_upper_to_lowerrgb:
+    # in meters: [x,y,z]
+    translation: [0, 0, -0.45529]
+    # in radians: [x,y,z]
+    #rotation: [0, 0, 0.085]
+    rotation: [0, 0, -1.4857]
+  lidar_lower_to_lowerrgb:
+
+    translation: [0, 0, 0.01511]
+    
+    #rotation: [0, 0, 0]
+    rotation: [0, 0,-1.5707]
+
 image:
   # all in pixels
   width: 3760

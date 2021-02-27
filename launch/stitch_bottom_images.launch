@@ -1,0 +1,77 @@
+<launch>
+
+<rosparam>use_sim_time: true</rosparam>
+
+<!--Static frame publishers for cylindrical cameras and lidar-->
+  <node pkg="tf" name="upper_velo_to_occam_frame_pub" type="static_transform_publisher"
+        args="0 0 -0.45529 0 0 -1.4857
+        upper_velodyne_frame occam 1"/>
+  <node pkg="tf" name="lower_velo_to_occam_frame_pub" type="static_transform_publisher"
+        args="0 0 0.01511 0 0 -1.5707
+        lower_velodyne occam 1"/>
+
+
+<node pkg="image_transport" type="republish" name="top_stitched" output="screen" args=" compressed in:=/ros_indigosdk_node/stitched_image0 raw out:=/ros_indigosdk_node/stitched_image0/image_raw"/>
+
+
+<node pkg="image_transport" type="republish" name="camera1" output="screen" args=" compressed in:=/ros_indigosdk_node/image1 raw out:=/ros_indigosdk_node/image1/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera3" output="screen" args=" compressed in:=/ros_indigosdk_node/image3 raw out:=/ros_indigosdk_node/image3/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera5" output="screen" args=" compressed in:=/ros_indigosdk_node/image5 raw out:=/ros_indigosdk_node/image5/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera7" output="screen" args=" compressed in:=/ros_indigosdk_node/image7 raw out:=/ros_indigosdk_node/image7/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera9" output="screen" args=" compressed in:=/ros_indigosdk_node/image9 raw out:=/ros_indigosdk_node/image9/image_raw"/> 
+
+
+<node pkg="ros_indigosdk" type="stitch" ns="bottom" name="stitch_bottom"  output="log" args="image0:=/ros_indigosdk_node/image1/image_raw
+									image1:=/ros_indigosdk_node/image3/image_raw
+									image2:=/ros_indigosdk_node/image5/image_raw
+									image3:=/ros_indigosdk_node/image7/image_raw
+									image4:=/ros_indigosdk_node/image9/image_raw
+									camera_info0:=/ros_indigosdk_node/camera_info5
+									camera_info1:=/ros_indigosdk_node/camera_info6
+									camera_info2:=/ros_indigosdk_node/camera_info7
+									camera_info3:=/ros_indigosdk_node/camera_info8
+									camera_info4:=/ros_indigosdk_node/camera_info9
+									">
+<param name="radius" type="int" value="2700000"/>
+<param name="rotation" type="int" value="270"/>
+<param name="scalewidth" type="int" value="1000"/>
+<param name="crop" type="int" value="1"/>
+<param name="auto_gain" type="bool" value="false"/>
+
+</node>
+
+
+
+<node pkg="image_transport" type="republish" name="camera0" output="screen" args=" compressed in:=/ros_indigosdk_node/image0 raw out:=/ros_indigosdk_node/image0/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera2" output="screen" args=" compressed in:=/ros_indigosdk_node/image2 raw out:=/ros_indigosdk_node/image2/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera4" output="screen" args=" compressed in:=/ros_indigosdk_node/image4 raw out:=/ros_indigosdk_node/image4/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera6" output="screen" args=" compressed in:=/ros_indigosdk_node/image6 raw out:=/ros_indigosdk_node/image6/image_raw"/>
+<node pkg="image_transport" type="republish" name="camera8" output="screen" args=" compressed in:=/ros_indigosdk_node/image8 raw out:=/ros_indigosdk_node/image8/image_raw"/> 
+
+<node pkg="ros_indigosdk" type="stitch" ns="top" name="stitch_top" output="log" args="image0:=/ros_indigosdk_node/image0/image_raw
+									image1:=/ros_indigosdk_node/image2/image_raw
+									image2:=/ros_indigosdk_node/image4/image_raw
+									image3:=/ros_indigosdk_node/image6/image_raw
+									image4:=/ros_indigosdk_node/image8/image_raw
+									camera_info0:=/ros_indigosdk_node/camera_info0
+									camera_info1:=/ros_indigosdk_node/camera_info1
+									camera_info2:=/ros_indigosdk_node/camera_info2
+									camera_info3:=/ros_indigosdk_node/camera_info3
+									camera_info4:=/ros_indigosdk_node/camera_info4
+									"> 
+<param name="radius" type="int" value="2700000"/>
+<param name="rotation" type="int" value="270"/>
+<param name="scalewidth" type="int" value="1000"/>
+<param name="crop" type="int" value="1"/>
+<param name="auto_gain" type="bool" value="false"/>
+</node> 
+
+
+
+<!--<node pkg="ros_indigosdk" type="cloud" name="cloudify" output="screen" args="image:=/ros_indigosdk_node/image0/image_raw 
+									    disp:=/disparity_image_0 
+									    camera_info:=/ros_indigosdk_node/camera_info0 
+									    camera_info_other:=/ros_indigosdk_node/camera_info5"/> -->
+
+
+</launch>
