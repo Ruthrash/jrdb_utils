@@ -37,6 +37,7 @@ fields = [PointField('x', 0, PointField.FLOAT32, 1),
           # PointField('rgba', 12, PointField.UINT32, 1),
           ]
 
+print(points)
 header = Header()
 header.stamp = rospy.Time.now()
 header.frame_id = "map"

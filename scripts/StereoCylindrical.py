@@ -6,11 +6,12 @@ import open3d as o3d
 import rospy 
 import message_filters
 from sensor_msgs.msg import Image
-from sensor_msgs.msg import PointCloud2
+from sensor_msgs.msg import PointCloud2, PointField
 import torch
 import ros_numpy
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
+import struct
 
 ##Pointcloud stuff 
 from sensor_msgs.msg import PointCloud2
@@ -53,6 +54,7 @@ class CylindricalCalibration:
 
     def Callback(self, upper_pcl_msg, lower_pcl_msg, upper_stitched_msg, lower_stitched_msg):
         cv2_img = self.bridge.imgmsg_to_cv2(upper_stitched_msg,"bgr8")
+        orig_img = self.bridge.imgmsg_to_cv2(upper_stitched_msg,"bgr8")
         pc_upper = ros_numpy.numpify(upper_pcl_msg).astype({'names':['x','y','z','intensity','ring'], 'formats':['f4','f4','f4','f4','f4'], 'offsets':[0,4,8,16,20], 'itemsize':32})
         pc_lower = ros_numpy.numpify(lower_pcl_msg).astype({'names':['x','y','z','intensity','ring'], 'formats':['f4','f4','f4','f4','f4'], 'offsets':[0,4,8,16,20], 'itemsize':32})
         pc_upper = torch.from_numpy(pc_upper.view(np.float32).reshape(pc_upper.shape + (-1,)))[:, [0,1,2,4]]
@@ -77,6 +79,7 @@ class CylindricalCalibration:
         
         #cloud_points = pc[0:3]
         pts = pts[ (3759>pts[:,0]) & ( 479> pts[:,1]) &(pts[:,1] > 0) & (pts[:,0] > 0)   ]
+        #pts_rgb = cv2_img[]
         cv2_img = cv2_img*0.0
         cv2_img[[pts[:,1].astype(int),pts[:,0].astype(int)]] = np.column_stack((pts[:,2],pts[:,2], pts[:,2]))
         #cv2.imwrite("/home/ruthz/top.jpg", cv2_img)
@@ -86,12 +89,33 @@ class CylindricalCalibration:
  
         dense_points = np.column_stack((self.u, self.v, final_depths.flatten()))
         cloud_points = self.calib_obj.project_image_to_rect(dense_points)##############
+        r = orig_img[self.v, self.u,2].astype(int)
+        g = orig_img[self.v, self.u,1].astype(int)
+        b = orig_img[self.v, self.u,0].astype(int)
+        a = 255*np.ones(b.shape).astype(int)
+        rgb_list = []
+        for i in range(len(r)):
+            rgb = struct.unpack('I', struct.pack('BBBB', b[i], g[i], r[i], a[i]))[0]
+            rgb_list.append(rgb)
+        rgb = np.array(rgb_list)
+        print(cloud_points.shape, r.shape, g.shape, b.shape, rgb.shape)
+        cloud_points = np.column_stack((cloud_points, rgb))
+        cloud_points = cloud_points.astype(object)
+        cloud_points[:,3] = cloud_points[:,3].astype(int)
+        fields = [PointField('x', 0, PointField.FLOAT32, 1),
+          PointField('y', 4, PointField.FLOAT32, 1),
+          PointField('z', 8, PointField.FLOAT32, 1),
+          PointField('rgba', 12, PointField.UINT32, 1),
+          ]
+        #print(cloud_points)
+        #print(fields)
         header = std_msgs.msg.Header()
         header.stamp = rospy.Time.now()
         header.frame_id = 'occam'
         #create pcl from points
-        scaled_polygon_pcl = pcl2.create_cloud_xyz32(header, cloud_points)
+        scaled_polygon_pcl = pcl2.create_cloud(header,fields, cloud_points)
         self.pcl_no_holes_pub.publish(scaled_polygon_pcl)
+
         ###################3print(np.count_nonzero(final_depths), final_depths.shape)
         #cv2.imwrite("/home/ruthz/before.png",cv2_img[:,:,0]*255)
         #cv2.imwrite("/home/ruthz/after.png",final_depths*255)
@@ -124,6 +148,55 @@ class CylindricalCalibration:
         """
 
 ##https://answers.ros.org/question/207071/how-to-fill-up-a-pointcloud-message-with-data-in-python/
+
+
+def xyzrgb_array_to_pointcloud2(points, colors, stamp=None, frame_id=None, seq=None):
+    '''
+    Create a sensor_msgs.PointCloud2 from an array
+    of points.
+    '''
+    msg = PointCloud2()
+    assert(points.shape == colors.shape)
+
+    buf = []
+
+    if stamp:
+        msg.header.stamp = stamp
+    if frame_id:
+        msg.header.frame_id = frame_id
+    if seq:
+        msg.header.seq = seq
+    if len(points.shape) == 3:
+        msg.height = points.shape[1]
+        msg.width = points.shape[0]
+    else:
+        N = len(points)
+        xyzrgb = np.array(np.hstack([points, colors]), dtype=np.float32)
+        msg.height = 1
+        msg.width = N
+
+    msg.fields = [
+        PointField('x', 0, PointField.FLOAT32, 1),
+        PointField('y', 4, PointField.FLOAT32, 1),
+        PointField('z', 8, PointField.FLOAT32, 1),
+        PointField('r', 12, PointField.FLOAT32, 1),
+        PointField('g', 16, PointField.FLOAT32, 1),
+        PointField('b', 20, PointField.FLOAT32, 1)
+    ]
+    msg.is_bigendian = False
+    msg.point_step = 24
+    msg.row_step = msg.point_step * N
+    msg.is_dense = True;
+    msg.data = xyzrgb.tostring()
+
+    return msg 
+
+
+
+
+
+
+
         
 if __name__ == '__main__':
     obj = CylindricalCalibration()
