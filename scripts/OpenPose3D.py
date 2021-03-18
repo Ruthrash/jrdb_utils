@@ -29,6 +29,11 @@ params["face"] = False
 params["hand"] = False
 params['net_resolution'] = "-1x272"
 
+params["heatmaps_add_parts"] = True
+params["heatmaps_add_bkg"] = True
+params["heatmaps_add_PAFs"] = True
+params["heatmaps_scale"] = 2
+
 # Starting OpenPose
 opWrapper = op.WrapperPython()
 opWrapper.configure(params)
@@ -131,6 +136,7 @@ datum.cvInputData = imgTop
 opWrapper.emplaceAndPop(op.VectorDatum([datum]))
 imgTopDet = datum.cvOutputData
 imgTopKp = datum.poseKeypoints
+
 #imgTopDet = cv2.rotate(imgTop,cv2.cv2.ROTATE_90_CLOCKWISE)
 
 
@@ -197,8 +203,8 @@ for top_idx, bottom_idx in zip(row_idxs, col_idxs):
     theta = imgTopKp[top_idx,:,0]*2*np.pi / w  
     x = depth*np.sin(theta)
     z = depth*np.cos(theta)
-    h = (imgTopKp[top_idx, :, 1] - c_y)/f_y
-    y = -1*np.multiply(h,depth)
+    #h = (imgTopKp[top_idx, :, 1] - c_y)/f_y
+    y = -1*z*(imgTopKp[top_idx,:,1] - c_y)/(f_y * np.cos(theta))
     print(len(x))
     ax = DrawSkeleton(x,y,z,ax)
     #ax.scatter(x, y, z, color="g", s=100)
@@ -265,3 +271,19 @@ a = Arrow3D([0, 1], [0, 1], [0, 1], mutation_scale=20,
 ax.add_artist(a)
 plt.show()
 """
+
+
+
+# Display Image
+counter = 0
+while 1:
+    num_maps = heatmaps.shape[0]
+    heatmap = heatmaps[counter, :, :].copy()
+    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+    #combined = cv2.addWeighted(outputImageF, 0.5, heatmap, 0.5, 0)
+    cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", heatmap)
+    key = cv2.waitKey(-1)
+    if key == 27:
+        break
+    counter += 1
+    counter = counter % num_maps

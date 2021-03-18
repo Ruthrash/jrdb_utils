@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # visualizer.py: rviz visualizer
-# Author: Ravi Joshi
-# Date: 2019/10/01
+# Author: Ruthrash (modified from Ravi Joshi's original ros_openpose)  
+# Date: 28/02/2021
 
 # import modules
 import math
@@ -64,8 +64,8 @@ class RealtimeVisualization():
         '''
 
         self.upper_body_ids = [0, 1, 8]
-        #self.hands_ids = [4, 3, 2, 1, 5, 6, 7]
-        #self.legs_ids = [22, 11, 10, 9, 8, 12, 13, 14, 19]
+        self.hands_ids = [4, 3, 2, 1, 5, 6, 7]
+        self.legs_ids = [22, 11, 10, 9, 8, 12, 13, 14, 19]
         self.legs_ids = [10, 9, 8, 12, 13]
         #self.body_parts = [self.upper_body_ids, self.hands_ids, self.legs_ids]
         self.body_parts = [self.upper_body_ids]
@@ -106,6 +106,7 @@ class RealtimeVisualization():
         marker.action = Marker.ADD
         marker.type = marker_type
         marker.scale = Vector3(size, size, size)
+        print('size', marker.scale.z)
         marker.header.stamp = time
         marker.header.frame_id = self.skeleton_frame
         marker.lifetime = rospy.Duration(1)  # 1 second
@@ -126,10 +127,23 @@ class RealtimeVisualization():
         '''
         This function will be called everytime whenever a message is received by the subscriber
         '''
+        
         marker_counter = 0
         person_counter = 0
         marker_array = MarkerArray()
+
         
+        for pose_3d in poses_3d:
+            now = rospy.Time.now()
+            marker_color = self.colors[person_counter % len(self.colors)]
+            body_marker = [self.create_marker(marker_counter + idx, marker_color, Marker.POINTS, self.skeleton_line_width, now) for idx in range(len(self.body_parts))]
+            marker_counter += len(self.body_parts)
+            for index, body_part in enumerate(self.body_parts):
+                body_marker[index].points = [self.GetPointFromVec(pose_3d[idx]) for idx in body_part if self.isValid(pose_3d[idx])]            
+            marker_array.markers.extend(body_marker)
+            person_counter += 1
+        self.skeleton_pub.publish(marker_array)
+        """
         for pose_3d in poses_3d:
             now = rospy.Time.now()
             marker_color = self.colors[person_counter % len(self.colors)]
@@ -157,7 +171,7 @@ class RealtimeVisualization():
 
         # publish the markers
         self.skeleton_pub.publish(marker_array)
-
+        """
     def GetPointFromVec(self, pose_3d):
         point_ = Point()
         point_.x = pose_3d[0]

@@ -99,9 +99,6 @@ class OpenPose3DNode:
         pts = pts[ (3759>pts[:,0]) & ( 479> pts[:,1]) &(pts[:,1] > 0) & (pts[:,0] > 0)   ]
 
         cloud_points = self.calib_obj.project_image_to_rect(pts)##############
-        header = std_msgs.msg.Header()
-        header.stamp = rospy.Time.now()
-        header.frame_id = 'occam'
         #create pcl from points
         #scaled_polygon_pcl = pcl2.create_cloud_xyz32(header, cloud_points)
         #self.pcl_pub.publish(scaled_polygon_pcl)
